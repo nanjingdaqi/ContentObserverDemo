@@ -1,22 +1,38 @@
 package org.peace.allinone.ui;
 
+import android.app.Activity;
+import android.database.ContentObserver;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Handler;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import org.peace.allinone.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
-  @Override protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
+    static String T = "peace";
 
-    ButterKnife.bind(this);
-  }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-  @OnClick(R.id.start_btn) public void onClick(View v) {
+        findViewById(R.id.unregister).setOnClickListener(this);
 
-  }
+        getContentResolver().registerContentObserver(Settings.System.getUriFor(Settings.System.SCREEN_BRIGHTNESS_MODE), true, mObserver);
+    }
+
+    @Override
+    public void onClick(View v) {
+        getContentResolver().unregisterContentObserver(mObserver);
+        Log.d(T, "unregister finished");
+    }
+
+    private ContentObserver mObserver = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+            Log.d(T, "onChange called");
+        }
+    };
 }
